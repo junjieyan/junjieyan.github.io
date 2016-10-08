@@ -1,0 +1,795 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+    
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+  <meta name="google-site-verification" content="6KKgdF0sQ3cUZxd9mIn2hDqLQVPMKz6EZDY3cH6SrrM" />
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.4"/>
+
+
+    <meta name="description" content="明天是你剩余人生的第一天" />
+
+
+
+  <meta name="keywords" content="java,jboss,web开发,应用服务器," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.4" />
+
+
+<meta name="description" content="jboss eap 6 提供了两种操作模式：standalone(独立服务模式) 和managed domain(受管域).两种模式的主要区别在于对服务器的管理，而不是它们为满足最终用户请求而提供的功能。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jboss eap 6 domain(域) 模式配置">
+<meta property="og:url" content="http://jacob110.github.io/2015/10/23/jboss-eap-6-domain-config/index.html">
+<meta property="og:site_name" content="Jacob's Notes">
+<meta property="og:description" content="jboss eap 6 提供了两种操作模式：standalone(独立服务模式) 和managed domain(受管域).两种模式的主要区别在于对服务器的管理，而不是它们为满足最终用户请求而提供的功能。">
+<meta property="og:image" content="http://7xngxf.com1.z0.glb.clouddn.com/jboss-domain-006.png">
+<meta property="og:image" content="http://7xngxf.com1.z0.glb.clouddn.com/jboss-domain-001.png">
+<meta property="og:image" content="http://7xngxf.com1.z0.glb.clouddn.com/jboss-domain-003.png">
+<meta property="og:image" content="http://7xngxf.com1.z0.glb.clouddn.com/jboss-005.png">
+<meta property="og:image" content="http://7xngxf.com1.z0.glb.clouddn.com/jboss-domain-007.png">
+<meta property="og:image" content="http://7xngxf.com1.z0.glb.clouddn.com/jboss-domain-008.png">
+<meta property="og:image" content="http://7xngxf.com1.z0.glb.clouddn.com/jboss-domain-009.png">
+<meta property="og:updated_time" content="2016-10-08T02:57:39.544Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="jboss eap 6 domain(域) 模式配置">
+<meta name="twitter:description" content="jboss eap 6 提供了两种操作模式：standalone(独立服务模式) 和managed domain(受管域).两种模式的主要区别在于对服务器的管理，而不是它们为满足最终用户请求而提供的功能。">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+    <title> jboss eap 6 domain(域) 模式配置 // Jacob's Notes </title>
+</head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+<!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-67694296-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?6eb2629b686364cda412b01163cddcea";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+<div class="container one-column page-post-detail">
+    <div class="headband"></div>
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+        <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">Jacob's Notes</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+<form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'guZMoFXzXEM3g5n8d9RX','2.0.0');
+</script>
+
+<div class="site-search-toggle"></div>
+    </div>
+  
+</nav>
+
+
+        </div>
+    </header>
+
+    <main id="main" class="main">
+        <div class="main-inner">
+            <div id="content" class="content">
+                
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              jboss eap 6 domain(域) 模式配置
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2015-10-23T21:29:39+08:00" content="2015-10-23">
+            2015-10-23
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing"><a href="/categories/Java-Web/" itemprop="url" rel="index"><span itemprop="name">Java Web</span></a></span>
+
+              
+              
+                ， 
+              
+
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing"><a href="/categories/Java-Web/JBoss/" itemprop="url" rel="index"><span itemprop="name">JBoss</span></a></span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2015/10/23/jboss-eap-6-domain-config/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/23/jboss-eap-6-domain-config/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>jboss eap 6 提供了两种操作模式：standalone(独立服务模式) 和managed domain(受管域).两种模式的主要区别在于对服务器的管理，而不是它们为满足最终用户请求而提供的功能。</p>
+<a id="more"></a>
+<h2 id="Domain_模式">Domain 模式</h2><p>domain 模式是通过单个控制点来管理多个 jboss eap 6 实例的模式。集中管理的jboss eap 6 服务器集合被称作域的成员，域里所有的jboss eap 6 实例共享一个公共的管理策略，以及配置。</p>
+<p>所有的jboss server 可以划分成不同的 server group(服务器组)，每个server group可以包含若干 jboss server，在所有这些server中，指定一个作为主控制器，及 master server，其他的作为 slave server。</p>
+<p><img src="http://7xngxf.com1.z0.glb.clouddn.com/jboss-domain-006.png" alt=""></p>
+<h2 id="环境准备">环境准备</h2><ul>
+<li>windows7</li>
+<li>jboss eap 6</li>
+</ul>
+<p>两台机器 172.21.0.201 作为 master server，172.21.0.57 作为 slave server</p>
+<h2 id="安装jboss">安装jboss</h2><p>两台机器分别安装 jboss eap 6，任意目录即可。<a href="https://www.jboss.org/products/eap/download/" target="_blank" rel="external">下载地址</a><br>下面用 <code>jboss_home=&quot;D:\Java\jboss-eap-6.3&quot;</code>代替jboss 安装目录</p>
+<h2 id="master_server_配置">master server 配置</h2><h3 id="修改host-xml">修改host.xml</h3><p>打开 <code>&quot;jboss_home\domain\configuration&quot;</code> 中的 host.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">interfaces</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">interface</span> <span class="attribute">name</span>=<span class="value">"management"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">inet-address</span> <span class="attribute">value</span>=<span class="value">"$&#123;jboss.bind.address.management:172.21.0.201&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">interface</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">interface</span> <span class="attribute">name</span>=<span class="value">"public"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">inet-address</span> <span class="attribute">value</span>=<span class="value">"$&#123;jboss.bind.address:172.21.0.201&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">interface</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">interface</span> <span class="attribute">name</span>=<span class="value">"unsecure"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">inet-address</span> <span class="attribute">value</span>=<span class="value">"$&#123;jboss.bind.address.unsecure:172.21.0.201&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">interface</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">interfaces</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>将其中的 <code>127.0.0.1</code> 替换成机器真是 ip，否则远程机器无法通过浏览器访问jboss 控制台</p>
+<p><code>jboss_home\bin\domain.bat</code> 以domain 模式启动 jboss</p>
+<p>进入控制台 <code>http://172.21.0.201:9990/console</code><br>首次进入会提示输入用户名密码，需要先创建一下，进入 <code>jboss_home\bin\add-user.bat</code> 根据提示创建账号密码。</p>
+<h3 id="创建_Group和Server">创建 Group和Server</h3><p>在控制台的 Domain Tab 页，可以看到默认的一些 group和server，先全部remove掉，然后创建自己的group 和server 如图<br><img src="http://7xngxf.com1.z0.glb.clouddn.com/jboss-domain-001.png" alt=""></p>
+<p>如果server 无法romve，可能是该server处于 started状态，需要先停掉，参考下图<br><img src="http://7xngxf.com1.z0.glb.clouddn.com/jboss-domain-003.png" alt=""></p>
+<p>创建server group 和server<br><a href="http://7xngxf.com1.z0.glb.clouddn.com/jboss-domain-002.png" target="_blank" rel="external"></a></p>
+<p>创建的时候会有个 <code>Port Offset</code>，即端口偏移量，默认端口是 <code>8080</code>,比如这里设置成 <code>1</code>,那么访问的时候 端口号就是 <code>8081</code></p>
+<h2 id="Slave_Server_配置">Slave Server 配置</h2><p>切换到Slave 机器(172.21.0.57)  进入 jboss domain 配置目录 <code>jboss_home\domain\configuration</code></p>
+<h3 id="修改host-xml-1">修改host.xml</h3><p>修改host.xml,现将原来的host.xml 和 host-slave.xml 改名备份，再将host-slave.xml 改名为 host.xml，打开 host.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">management-interfaces</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">native-interface</span> <span class="attribute">security-realm</span>=<span class="value">"ManagementRealm"</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- modify port or conflict with master port--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">socket</span> <span class="attribute">interface</span>=<span class="value">"management"</span> <span class="attribute">port</span>=<span class="value">"$&#123;jboss.management.native.port:9099&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">native-interface</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">management-interfaces</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>修改其中的端口，改成其他不用的端口，不能与master server 的端口相同，否则会起冲突报错。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">domain-controller</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="title">remote</span> <span class="attribute">host</span>=<span class="value">"$&#123;jboss.domain.master.address:172.21.0.201&#125;"</span> <span class="attribute">port</span>=<span class="value">"$&#123;jboss.domain.master.port:9999&#125;"</span> <span class="attribute">security-realm</span>=<span class="value">"ManagementRealm"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">domain-controller</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>将其中连接 master的地址改为 master server 的真实 ip，本文为 <code>172.21.0.201</code></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">interfaces</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">interface</span> <span class="attribute">name</span>=<span class="value">"management"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">inet-address</span> <span class="attribute">value</span>=<span class="value">"$&#123;jboss.bind.address.management:0.0.0.0&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">interface</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">interface</span> <span class="attribute">name</span>=<span class="value">"public"</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="title">inet-address</span> <span class="attribute">value</span>=<span class="value">"$&#123;jboss.bind.address:0.0.0.0&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">interface</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">interface</span> <span class="attribute">name</span>=<span class="value">"unsecure"</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- Used for IIOP sockets in the standard configuration.</span><br><span class="line">             To secure JacORB you need to setup SSL --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">inet-address</span> <span class="attribute">value</span>=<span class="value">"$&#123;jboss.bind.address.unsecure:0.0.0.0&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">interface</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">interfaces</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>将原先的 <code>127.0.0.1</code>修改为<code>0.0.0.0</code>或者本机真是IP</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">servers</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">server</span> <span class="attribute">name</span>=<span class="value">"slave-server-one"</span> <span class="attribute">group</span>=<span class="value">"my-group-one"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">socket-bindings</span> <span class="attribute">port-offset</span>=<span class="value">"2"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">server</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">server</span> <span class="attribute">name</span>=<span class="value">"slave-server-two"</span> <span class="attribute">group</span>=<span class="value">"my-group-two"</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- server-two avoids port conflicts by incrementing the ports in</span><br><span class="line">             the default socket-group declared in the server-group --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">socket-bindings</span> <span class="attribute">port-offset</span>=<span class="value">"3"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">server</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">servers</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>手动给Slave Server 创建两个Server，并且指定group，group为master server上已经创建好的，同样指定port-offeset</p>
+<p>最后给 Slave server 添加个名字，以便在 master server 控制台显示，如下</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;host <span class="property">name</span>=<span class="string">"slave57"</span> xmlns=<span class="string">"urn:jboss:domain:1.6"</span>&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="安全认证配置">安全认证配置</h2><p>切回到master server上，通过 <code>jboss_home\bin\add-user.bat</code> 添加一个名为 <code>slave57</code>的管理员帐号，记住最后生成 密钥，如下图<br><img src="http://7xngxf.com1.z0.glb.clouddn.com/jboss-005.png" alt=""></p>
+<p>再切回到 slave server上，将刚才的密钥添加到 host.xml 中 如下<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">server-identities</span>&gt;</span></span><br><span class="line">     <span class="comment">&lt;!-- Replace this with either a base64 password of your own, or use a vault with a vault expression --&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="title">secret</span> <span class="attribute">value</span>=<span class="value">"d2VibG9naWMxMjMh"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">server-identities</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>好了，配置完了，依次以 domain 模式启动 master、slave 上的jboss，不出意外会在master 控制台看到名为 <code>slave57</code>的 slave server<br><img src="http://7xngxf.com1.z0.glb.clouddn.com/jboss-domain-007.png" alt=""></p>
+<h2 id="应用部署">应用部署</h2><p>部署一个最简单 hello world 例子试试，如图<br><img src="http://7xngxf.com1.z0.glb.clouddn.com/jboss-domain-008.png" alt=""><br>将打包好的 war包上传，然后分配(assign)到任意一个 group即可，不出意外，通过相关 server group 下的 jboss server 就都可以访问了。本例中 两个group，6个server,如图<br><img src="http://7xngxf.com1.z0.glb.clouddn.com/jboss-domain-009.png" alt=""></p>
+<p>这样可以通过6个url都可以访问</p>
+<ul>
+<li>172.21.0.57:8083/gotimp/</li>
+<li>172.21.0.57:8082/gotimp/</li>
+<li>172.21.0.201:8084/gotimp/</li>
+<li>172.21.0.201:8083/gotimp/</li>
+<li>172.21.0.201:8082/gotimp/</li>
+<li>172.21.0.201:8081/gotimp/</li>
+</ul>
+<h2 id="总结">总结</h2><p>Domain模式的主要目的是使得多台jboss服务器的配置可以集中于一点，统一配置、统一部署。不同于群集(Cluster),群集的目标是让多台服务器分摊压力，当一台或多台服务器当机时，服务可以继续保持运转。</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag">#java</a>
+          
+            <a href="/tags/jboss/" rel="tag">#jboss</a>
+          
+            <a href="/tags/web开发/" rel="tag">#web开发</a>
+          
+            <a href="/tags/应用服务器/" rel="tag">#应用服务器</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/10/27/jquery-form-submit-not-working-in-firefox/" rel="prev">jQuery使用form.submit在Firefox和IE下无效</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/10/13/mac-os-install-mysql5-7/" rel="next">Mac OS X 下安装MySQL 5.7</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2015/10/23/jboss-eap-6-domain-config/"
+     data-title="jboss eap 6 domain(域) 模式配置"
+     data-content=""
+     data-url="http://jacob110.github.io/2015/10/23/jboss-eap-6-domain-config/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+
+            </div>
+
+            
+
+            
+              <div class="comments" id="comments">
+                
+                  <div class="ds-thread" data-thread-key="2015/10/23/jboss-eap-6-domain-config/"
+                       data-title="jboss eap 6 domain(域) 模式配置" data-url="http://jacob110.github.io/2015/10/23/jboss-eap-6-domain-config/">
+                  </div>
+                
+              </div>
+            
+        </div>
+
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/panda.jpg" alt="Jacob Yan" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Jacob Yan</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">明天是你剩余人生的第一天</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">23</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jacob110" target="_blank">GitHub</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/JJ_Jacob" target="_blank">Twitter</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/jacob110" target="_blank">Weibo</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            <p class="site-author-name">Linkes</p>
+            
+              <span class="links-of-author-item">
+              <a href="http://pinkyjie.com/" target="_blank">进击的马斯特</a>
+              </span>
+            
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Domain_模式"><span class="nav-number">1.</span> <span class="nav-text">Domain 模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#环境准备"><span class="nav-number">2.</span> <span class="nav-text">环境准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装jboss"><span class="nav-number">3.</span> <span class="nav-text">安装jboss</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#master_server_配置"><span class="nav-number">4.</span> <span class="nav-text">master server 配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修改host-xml"><span class="nav-number">4.1.</span> <span class="nav-text">修改host.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建_Group和Server"><span class="nav-number">4.2.</span> <span class="nav-text">创建 Group和Server</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Slave_Server_配置"><span class="nav-number">5.</span> <span class="nav-text">Slave Server 配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修改host-xml-1"><span class="nav-number">5.1.</span> <span class="nav-text">修改host.xml</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安全认证配置"><span class="nav-number">6.</span> <span class="nav-text">安全认证配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用部署"><span class="nav-number">7.</span> <span class="nav-text">应用部署</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">8.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="copyright" >
+  
+  &copy; &nbsp;  2015 - 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jacob Yan</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+        </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+</div>
+
+<script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jacob110"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+  	  <script type="text/javascript">
+  		var duoshuo_user_ID = jacob110
+  	  </script>
+     
+  	<script src="/js/ua-parser.min.js"></script>
+  	<script src="/js/hook-duoshuo.js"></script>
+  
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.4"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.4"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.4" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/search-toggle.js"></script>
+
+
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.4" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        if (CONFIG.sidebar === 'always') {
+            displaySidebar();
+        }
+    });
+</script>
+
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+
+
+
+
+<!-- lazyload -->
+<script type="text/javascript" src="/js/lazyload.js"></script>
+<script type="text/javascript">
+    jQuery(function () {
+        jQuery("#posts img").lazyload({
+            placeholder: "/images/loading.gif",
+            effect: "fadeIn"
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,786 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+    
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+  <meta name="google-site-verification" content="6KKgdF0sQ3cUZxd9mIn2hDqLQVPMKz6EZDY3cH6SrrM" />
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.4"/>
+
+
+    <meta name="description" content="明天是你剩余人生的第一天" />
+
+
+
+  <meta name="keywords" content="java,jax-ws,soap,webservice," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.4" />
+
+
+<meta name="description" content="SOAP 简介SOAP 简单对象访问协议(Simple Object Access Protocol)是一种标准化的通讯规范，主要用于Web服务(Web Service)中。是一个基于XML的协议，它包括四个部分
+
+SOAP封装(envelop)，封装定义了一个描述消息中的内容是什么，是谁发送的，谁应当接受并处理它以及如何处理它们的框架；
+SOAP编码规则（encoding rules），用于表示">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JAX-WS (SOAP) 开发 WebService">
+<meta property="og:url" content="http://jacob110.github.io/2015/09/24/Java-WebService-JAX-WS-SOAP/index.html">
+<meta property="og:site_name" content="Jacob's Notes">
+<meta property="og:description" content="SOAP 简介SOAP 简单对象访问协议(Simple Object Access Protocol)是一种标准化的通讯规范，主要用于Web服务(Web Service)中。是一个基于XML的协议，它包括四个部分
+
+SOAP封装(envelop)，封装定义了一个描述消息中的内容是什么，是谁发送的，谁应当接受并处理它以及如何处理它们的框架；
+SOAP编码规则（encoding rules），用于表示">
+<meta property="og:image" content="http://jacob110.github.io/images/jax-ws-01.gif">
+<meta property="og:image" content="http://jacob110.github.io/images/jax-ws-05.png">
+<meta property="og:image" content="http://jacob110.github.io/images/jax-ws-06.png">
+<meta property="og:image" content="http://jacob110.github.io/images/jax-ws-02.png">
+<meta property="og:image" content="http://jacob110.github.io/images/jax-ws-04.png">
+<meta property="og:image" content="http://jacob110.github.io/images/jax-ws-client.png">
+<meta property="og:updated_time" content="2016-10-08T02:57:39.542Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JAX-WS (SOAP) 开发 WebService">
+<meta name="twitter:description" content="SOAP 简介SOAP 简单对象访问协议(Simple Object Access Protocol)是一种标准化的通讯规范，主要用于Web服务(Web Service)中。是一个基于XML的协议，它包括四个部分
+
+SOAP封装(envelop)，封装定义了一个描述消息中的内容是什么，是谁发送的，谁应当接受并处理它以及如何处理它们的框架；
+SOAP编码规则（encoding rules），用于表示">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+    <title> JAX-WS (SOAP) 开发 WebService // Jacob's Notes </title>
+</head>
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+<!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-67694296-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?6eb2629b686364cda412b01163cddcea";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+<div class="container one-column page-post-detail">
+    <div class="headband"></div>
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+        <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">Jacob's Notes</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+<form class="site-search-form">
+  <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+</form>
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'guZMoFXzXEM3g5n8d9RX','2.0.0');
+</script>
+
+<div class="site-search-toggle"></div>
+    </div>
+  
+</nav>
+
+
+        </div>
+    </header>
+
+    <main id="main" class="main">
+        <div class="main-inner">
+            <div id="content" class="content">
+                
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              JAX-WS (SOAP) 开发 WebService
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2015-09-24T21:49:21+08:00" content="2015-09-24">
+            2015-09-24
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing"><a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a></span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2015/09/24/Java-WebService-JAX-WS-SOAP/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/24/Java-WebService-JAX-WS-SOAP/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="SOAP_简介">SOAP 简介</h2><p><code>SOAP</code> 简单对象访问协议(Simple Object Access Protocol)是一种标准化的通讯规范，主要用于Web服务(Web Service)中。是一个基于XML的协议，它包括四个部分</p>
+<ul>
+<li>SOAP封装(envelop)，封装定义了一个描述消息中的内容是什么，是谁发送的，谁应当接受并处理它以及如何处理它们的框架；</li>
+<li>SOAP编码规则（encoding rules），用于表示应用程序需要使用的数据类型的实例; </li>
+<li>SOAP RPC表示(RPC representation)，表示远程过程调用和应答的协定;</li>
+<li>SOAP绑定（binding），使用底层协议交换信息。</li>
+</ul>
+<a id="more"></a>
+<h2 id="JAX-WS">JAX-WS</h2><p>Java API for XML Web Services(JAX-WS)是一组用来创建Web服务的API，主要是基于<code>SOAP</code>规范的。JAX-WS 提供了许多注解来简化 WebService 服务端和客户端的开发。</p>
+<p><img src="/images/jax-ws-01.gif" alt=""></p>
+<h2 id="IDEA_下开发_WebService"><code>IDEA</code> 下开发 WebService</h2><p>定义接口<br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">package</span> <span class="tag">com</span><span class="class">.jacob</span><span class="class">.ws</span><span class="class">.service</span>;</span><br><span class="line"></span><br><span class="line"><span class="tag">import</span> <span class="tag">javax</span><span class="class">.jws</span><span class="class">.WebMethod</span>;</span><br><span class="line"><span class="tag">import</span> <span class="tag">javax</span><span class="class">.jws</span><span class="class">.WebService</span>;</span><br><span class="line"></span><br><span class="line"><span class="at_rule">@<span class="keyword">WebService</span></span><br><span class="line">public interface FirstService </span>&#123;</span><br><span class="line">    <span class="at_rule">@<span class="keyword">WebMethod</span></span><br><span class="line">    public String <span class="function">sayHi</span>(String name)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>实现类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.jacob.ws.service.imp;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.jacob.ws.service.FirstService;</span><br><span class="line"><span class="keyword">import</span> javax.jws.WebMethod;</span><br><span class="line"><span class="keyword">import</span> javax.jws.WebService;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@WebService</span>(endpointInterface = <span class="string">"com.jacob.ws.service.FirstService"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FirstServiceImp</span> <span class="keyword">implements</span> <span class="title">FirstService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">sayHi</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"Hi,"</span> + name + <span class="string">",this is first JAX-WS Service"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="发布">发布</h3><p>两种发布方式，一种是 Java 类中中定义 <code>Endpoit</code> 来发布，另一种是在 Web 容器中发布</p>
+<h3 id="1-_Endpoint_发布">1. Endpoint 发布</h3><figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.jacob.ws.endpoit;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.jacob.ws.service.imp.FirstServiceImp;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.xml.ws.Endpoint;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> FirstServicePublisher &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> main(String[] arg)&#123;</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"Service is publishing..."</span>);</span><br><span class="line">        Endpoint.publish(<span class="string">"http://localhost:9999/ws/firstservice"</span>, <span class="keyword">new</span> FirstServiceImp());</span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"Service is published."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="2-_Web_应用中发布">2. Web 应用中发布</h3><p>新建一个 Web项目，打开模块设置(<code>Modeule Settings</code>) 添加 <code>WebService</code> 的 <code>Facets</code> 如图<br><img src="/images/jax-ws-05.png" alt=""></p>
+<p>然后选择要添加的 <code>WebService</code> 类型，如图<br><img src="/images/jax-ws-06.png" alt=""></p>
+<p>添加完以后会自动生成 相关的配置文件，需要添加两个依赖项：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">groupId</span>&gt;</span>com.sun.xml.ws<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></span><br><span class="line"> 	<span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>jaxws-rt<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">version</span>&gt;</span>2.1.3<span class="tag">&lt;/<span class="title">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">groupId</span>&gt;</span>javax.xml.ws<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>jaxws-api<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">version</span>&gt;</span>2.2.11<span class="tag">&lt;/<span class="title">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><code>sun-jaxws.xml</code> 中添加 <code>endpoint</code></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="pi">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">endpoints</span> <span class="attribute">xmlns</span>=<span class="value">'http://java.sun.com/xml/ns/jax-ws/ri/runtime'</span> <span class="attribute">version</span>=<span class="value">'2.0'</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">endpoint</span> <span class="attribute">name</span>=<span class="value">"FirstService"</span> <span class="attribute">implementation</span>=<span class="value">"com.jacob.ws.service.imp.FirstServiceImp"</span></span><br><span class="line">              <span class="attribute">url-pattern</span>=<span class="value">"/firstws"</span>&gt;</span><span class="tag">&lt;/<span class="title">endpoint</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">endpoints</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><code>web.xml</code> 中添加 <code>listner</code></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="doctype">&lt;!DOCTYPE web-app PUBLIC</span><br><span class="line"> "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"</span><br><span class="line"> "http://java.sun.com/dtd/web-app_2_3.dtd" &gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">web-app</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">display-name</span>&gt;</span>JaxWebService<span class="tag">&lt;/<span class="title">display-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">listener</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">listener-class</span>&gt;</span>com.sun.xml.ws.transport.http.servlet.WSServletContextListener<span class="tag">&lt;/<span class="title">listener-class</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">listener</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">servlet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">servlet-name</span>&gt;</span>WSServlet<span class="tag">&lt;/<span class="title">servlet-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">display-name</span>&gt;</span>WSServlet<span class="tag">&lt;/<span class="title">display-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">description</span>&gt;</span>JAX-WS endpoint<span class="tag">&lt;/<span class="title">description</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">servlet-class</span>&gt;</span>com.sun.xml.ws.transport.http.servlet.WSServlet<span class="tag">&lt;/<span class="title">servlet-class</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">load-on-startup</span>&gt;</span>1<span class="tag">&lt;/<span class="title">load-on-startup</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">servlet</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">servlet-mapping</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">servlet-name</span>&gt;</span>WSServlet<span class="tag">&lt;/<span class="title">servlet-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">url-pattern</span>&gt;</span>/firstws<span class="tag">&lt;/<span class="title">url-pattern</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">servlet-mapping</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">web-app</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>这里的 <code>url-pattern</code> 必须跟上面 <code>endpoint</code> 中的一样</p>
+<p>启动server 浏览器输入 url <a href="http://localhost:8080/JaxWebService/firstws" target="_blank" rel="external">http://localhost:8080/JaxWebService/firstws</a> 如图<br><img src="/images/jax-ws-02.png" alt=""></p>
+<h2 id="Client_调用">Client 调用</h2><p>新建一个项目，或者直接在刚才的 项目中也可以。右键选择 WebService-&gt;Generate Java Code From Wsdl</p>
+<p><img src="/images/jax-ws-04.png" alt=""><br>wsdl url 输入刚才发布的 service url ,确定后会自动生成客户端调用相关的类,项目结构</p>
+<p><img src="/images/jax-ws-client.png" alt=""></p>
+<p>编写测试类：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">FirstServiceClient</span> &#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(<span class="params">String[] args</span>)</span>&#123;</span><br><span class="line">        FirstServiceImpService firstServiceImp=<span class="keyword">new</span> FirstServiceImpService();</span><br><span class="line">        System.<span class="keyword">out</span>.println(firstServiceImp.getFirstServiceImpPort().sayHi(<span class="string">"jacob"</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>控制台输出</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Hi,jacob,<span class="keyword">this</span> <span class="keyword">is</span> first JAX-WS Service</span><br></pre></td></tr></table></figure>
+<h2 id="可能会碰到的问题">可能会碰到的问题</h2><p>编译、打包都正常，但是启动 <code>Server</code> 报错</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">com.sun.xml.ws.model.RuntimeModelerException: runtime modeler <span class="keyword">error</span>: Wrapper <span class="type">class</span> com.jacob.ws.service.jaxws.SayHi <span class="keyword">is</span> <span class="keyword">not</span> found. Have you <span class="command">run</span> APT <span class="keyword">to</span> generate them?</span><br></pre></td></tr></table></figure>
+<p><strong>Solution</strong></p>
+<p>服务接口添加 <code>@SOAPBinding</code> 注解，如下</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@<span class="function"><span class="title">SOAPBinding</span><span class="params">(style = SOAPBinding.Style.RPC, use= SOAPBinding.Use.LITERAL)</span></span></span><br></pre></td></tr></table></figure>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag">#java</a>
+          
+            <a href="/tags/jax-ws/" rel="tag">#jax-ws</a>
+          
+            <a href="/tags/soap/" rel="tag">#soap</a>
+          
+            <a href="/tags/webservice/" rel="tag">#webservice</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/10/13/java-ie8-cannot-download/" rel="prev">Java Web 应用在IE8下无法下载文件的问题</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/09/19/hexo-build-github-page/" rel="next">Hexo搭建静态博客</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2015/09/24/Java-WebService-JAX-WS-SOAP/"
+     data-title="JAX-WS (SOAP) 开发 WebService"
+     data-content=""
+     data-url="http://jacob110.github.io/2015/09/24/Java-WebService-JAX-WS-SOAP/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+
+            </div>
+
+            
+
+            
+              <div class="comments" id="comments">
+                
+                  <div class="ds-thread" data-thread-key="2015/09/24/Java-WebService-JAX-WS-SOAP/"
+                       data-title="JAX-WS (SOAP) 开发 WebService" data-url="http://jacob110.github.io/2015/09/24/Java-WebService-JAX-WS-SOAP/">
+                  </div>
+                
+              </div>
+            
+        </div>
+
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/panda.jpg" alt="Jacob Yan" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">Jacob Yan</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">明天是你剩余人生的第一天</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">23</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jacob110" target="_blank">GitHub</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/JJ_Jacob" target="_blank">Twitter</a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/jacob110" target="_blank">Weibo</a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="http://creativecommons.org/licenses/by-nc-sa/4.0" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            <p class="site-author-name">Linkes</p>
+            
+              <span class="links-of-author-item">
+              <a href="http://pinkyjie.com/" target="_blank">进击的马斯特</a>
+              </span>
+            
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#SOAP_简介"><span class="nav-number">1.</span> <span class="nav-text">SOAP 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JAX-WS"><span class="nav-number">2.</span> <span class="nav-text">JAX-WS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IDEA_下开发_WebService"><span class="nav-number">3.</span> <span class="nav-text">IDEA 下开发 WebService</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#发布"><span class="nav-number">3.1.</span> <span class="nav-text">发布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-_Endpoint_发布"><span class="nav-number">3.2.</span> <span class="nav-text">1. Endpoint 发布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-_Web_应用中发布"><span class="nav-number">3.3.</span> <span class="nav-text">2. Web 应用中发布</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Client_调用"><span class="nav-number">4.</span> <span class="nav-text">Client 调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可能会碰到的问题"><span class="nav-number">5.</span> <span class="nav-text">可能会碰到的问题</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+        <div class="footer-inner">
+            <div class="copyright" >
+  
+  &copy; &nbsp;  2015 - 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jacob Yan</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+        </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+</div>
+
+<script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"jacob110"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+  	  <script type="text/javascript">
+  		var duoshuo_user_ID = jacob110
+  	  </script>
+     
+  	<script src="/js/ua-parser.min.js"></script>
+  	<script src="/js/hook-duoshuo.js"></script>
+  
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.4"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.4"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.4" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/search-toggle.js"></script>
+
+
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.4" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        if (CONFIG.sidebar === 'always') {
+            displaySidebar();
+        }
+    });
+</script>
+
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+
+
+
+
+<!-- lazyload -->
+<script type="text/javascript" src="/js/lazyload.js"></script>
+<script type="text/javascript">
+    jQuery(function () {
+        jQuery("#posts img").lazyload({
+            placeholder: "/images/loading.gif",
+            effect: "fadeIn"
+        });
+    });
+</script>
+</body>
+</html>
